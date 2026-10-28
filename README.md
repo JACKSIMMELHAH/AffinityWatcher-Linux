@@ -19,7 +19,7 @@ What's new in v5
 
 Install / update
 ----------------
-1. Extract primegrid-affinity-gui-v5.zip.
+1. Extract AffinityWatcherZorin-5.zip.
 2. Open Terminal in the extracted folder and run:
        bash install.sh
 3. If Tkinter is missing:
