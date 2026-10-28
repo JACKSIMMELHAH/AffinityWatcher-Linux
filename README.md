@@ -173,9 +173,10 @@ if empty:
 
 After reverting, the permission error may return because BOINC's tasks once again
 run under a different account. Do not run the entire GUI as root as a workaround.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Buttons
--------
+
 - Refresh tasks: discover live PrimeGrid processes.
 - Save & apply selected task: save the selected slot, bind the current
   process to it, and apply the chosen CPU pool.
