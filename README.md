@@ -91,9 +91,7 @@ BIOS, BOINC thread-count configuration, or system-wide CPU settings.
 
 BOINC permission issue (native package on Zorin/Ubuntu)
 -------------------------------------------------------
-
-Symptom
-~~~~~~~
+~~~~~~~~
 The GUI detects a PrimeGrid task, but applying affinity fails with an error like:
 
     [Errno 1] Operation not permitted
