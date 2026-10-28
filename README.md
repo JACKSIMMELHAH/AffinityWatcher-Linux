@@ -1,5 +1,3 @@
-# AffinityWatcherZorin
-
 PrimeGrid Affinity GUI v5 — refreshed interface
 ================================================
 
@@ -90,6 +88,93 @@ assignment fails partway through, it attempts to restore the previous masks.
 Changing affinity can reduce performance, so compare equivalent work-unit
 progress before choosing a permanent layout. This tool does not change the
 BIOS, BOINC thread-count configuration, or system-wide CPU settings.
+
+BOINC permission issue (native package on Zorin/Ubuntu)
+-------------------------------------------------------
+
+Symptom
+~~~~~~~
+The GUI detects a PrimeGrid task, but applying affinity fails with an error like:
+
+    [Errno 1] Operation not permitted
+
+This commonly occurs when the native boinc-client service runs calculations as
+the separate `boinc` system account while PrimeGrid Affinity runs as your desktop
+user. Linux normally prevents an unprivileged user from changing the CPU affinity
+of another user's process.
+
+First, confirm that you are using the native APT package, not the Flatpak build:
+
+    systemctl status boinc-client --no-pager
+
+The native package normally has a `boinc-client.service`. The Flatpak build has a
+different runtime model and may not provide this service.
+
+Workaround (changes the BOINC service account)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The following workaround was tested on a local Zorin installation. It runs the
+BOINC client under your normal desktop user so the GUI and BOINC calculation
+processes have the same user identity. This weakens BOINC's normal security
+isolation: project applications may be able to access files available to your
+user. Use this only on a personal machine where you accept that trade-off; a
+narrowly scoped privileged helper for affinity changes would be safer.
+
+Before proceeding, close BOINC Manager. Stopping the service may interrupt active
+work; allow tasks to checkpoint first if you want to minimize lost progress.
+Run these commands from a terminal opened as your normal desktop user (do not
+open a root shell first):
+
+    u="$(id -un)"
+    g="$(id -gn)"
+
+    sudo systemctl stop boinc-client
+
+    sudo install -d /etc/systemd/system/boinc-client.service.d
+
+    printf '[Service]\nUser=%s\nGroup=%s\nSupplementaryGroups=boinc\n' "$u" "$g" | \
+      sudo tee /etc/systemd/system/boinc-client.service.d/affinity-user.conf >/dev/null
+
+    sudo chown -R "$u:$g" /var/lib/boinc-client
+    sudo systemctl daemon-reload
+    sudo systemctl start boinc-client
+
+This creates a systemd service override, changes the ownership of the BOINC data
+directory to your user, reloads systemd, and starts BOINC again. It does not edit
+the PrimeGrid Affinity profile file. The saved profiles remain in:
+
+    ~/.local/state/primegrid-affinity-gui/settings.json
+
+To verify the service identity:
+
+    systemctl show boinc-client -p User -p Group -p SupplementaryGroups
+
+Then reopen PrimeGrid Affinity, refresh the task list, and check the Activity log.
+The monitor log is:
+
+    ~/.local/state/primegrid-affinity-gui/monitor.log
+
+If it still reports `Operation not permitted`, do not keep repeating the ownership
+change; inspect the exact log message and service status first.
+
+Revert the workaround
+~~~~~~~~~~~~~~~~~~~~~
+To restore the usual dedicated `boinc` service account on a standard Zorin/Ubuntu
+APT installation, stop the service, remove the override, restore ownership of the
+BOINC data directory, reload systemd, and start the service:
+
+    sudo systemctl stop boinc-client
+    sudo rm -f /etc/systemd/system/boinc-client.service.d/affinity-user.conf
+    sudo chown -R boinc:boinc /var/lib/boinc-client
+    sudo systemctl daemon-reload
+    sudo systemctl start boinc-client
+
+This re-enables the default service identity. The override directory can be removed
+if empty:
+
+    sudo rmdir /etc/systemd/system/boinc-client.service.d 2>/dev/null || true
+
+After reverting, the permission error may return because BOINC's tasks once again
+run under a different account. Do not run the entire GUI as root as a workaround.
 
 Buttons
 -------
