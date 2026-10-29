@@ -8,9 +8,6 @@ Requirements: Python 3.8+ and Tkinter.
 Ubuntu / Debian / Zorin:
     sudo apt install python3 python3-tk
 
-Arch Linux:
-    sudo pacman -S python tk
-
 1. Extract the ZIP.
 2. Open a terminal in the extracted folder and run:
        bash install.sh
@@ -29,18 +26,15 @@ project applications may be able to access files available to your user. A
 restricted privileged helper would be safer, but is not included here. Stop
 active work or let it checkpoint before proceeding.
 
-Choose the correct data directory below. Do not continue unless the service
-exists and you have confirmed the directory for your installation.
+For a standard Ubuntu / Debian / Zorin APT installation, the data directory is
+usually `/var/lib/boinc-client`. Confirm that the service and directory match
+your installation before continuing.
 
-Ubuntu / Debian / Zorin:
+Run these commands as your normal desktop user, not from a root shell:
+
+    set -e
     DATA_DIR=/var/lib/boinc-client
-
-Arch Linux (use this instead):
-    DATA_DIR=/var/lib/boinc
-
-Then run the following commands as your normal desktop user, not from a root
-shell. Keep the DATA_DIR line you selected immediately before these commands:
-
+    test -d "$DATA_DIR" || { echo "BOINC data directory not found; stop and check your installation."; exit 1; }
     u="$(id -un)"
     g="$(id -gn)"
     sudo systemctl stop boinc-client
@@ -51,14 +45,13 @@ shell. Keep the DATA_DIR line you selected immediately before these commands:
     sudo systemctl daemon-reload
     sudo systemctl start boinc-client
 
-This workaround was tested on Zorin only. The Arch commands are provided as a
-starting point and have not been runtime-tested. If the service's user, group,
-unit name, or data directory differs, do not copy these commands unchanged.
-
 UNDO THE WORKAROUND
 -------------------
-Set DATA_DIR to the same directory you used above, then run:
+For a standard APT installation where the original service user and group are
+both `boinc`, run:
 
+    set -e
+    DATA_DIR=/var/lib/boinc-client
     sudo systemctl stop boinc-client
     sudo rm -f /etc/systemd/system/boinc-client.service.d/affinity-user.conf
     sudo chown -R boinc:boinc "$DATA_DIR"
