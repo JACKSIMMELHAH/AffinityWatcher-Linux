@@ -5,13 +5,16 @@ INSTALLATION
 ------------
 Requirements: Python 3.8+ and Tkinter.
 
-Ubuntu / Debian / Zorin:
     sudo apt install python3 python3-tk
 
+Ubuntu / Debian / Zorin:
+    
 1. Extract the ZIP.
 2. Open a terminal in the extracted folder and run:
+   
        bash install.sh
-3. Open your application menu and launch "PrimeGrid Affinity".
+   
+4. Open your application menu and launch "PrimeGrid Affinity".
 
 BOINC PERMISSION WORKAROUND
 ---------------------------
