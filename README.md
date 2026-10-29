@@ -36,7 +36,9 @@ Disable automatic startup:
     mv ~/.config/autostart/primegrid-affinity-monitor.desktop \
        ~/.config/autostart/primegrid-affinity-monitor.desktop.disabled
 
-Re-enable it by removing the .disabled suffix. The monitor log is:
+Re-enable it by removing the .disabled suffix. 
+
+The monitor log is located at:
 
     ~/.local/state/primegrid-affinity-gui/monitor.log
 
