@@ -1185,7 +1185,7 @@ def run_gui():
 
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     root = tk.Tk()
-    root.title(f"{APP_NAME} · v5")
+    root.title(f"{APP_NAME} · v6.0.1")
     root.geometry("1180x900")
     root.minsize(1000, 760)
     root.configure(background="#f3f5fa")
